@@ -5,11 +5,13 @@
 
     <div class="row">
         <div class="col-md-6">
+            <p *ngIf="isLoading" class="loading">Loading...</p>
+
             <ng-container *ngIf="purchases && purchases.length > 0 else error">
                 <purchase *ngFor="let purchase of purchases" [purchase]="purchase"></purchase>
             </ng-container>
             <ng-template #error>
-                <p class="error">No purchases to display</p>
+                <p *ngIf="!isLoading" class="error">No purchases to display</p>
             </ng-template>
         </div>
     </div>

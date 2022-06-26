@@ -2,8 +2,15 @@ h2 {
     color: cornflowerblue;
 }
 
-.error {
-    color: orangered;
+p {
     font-size: 14pt;
     font-weight: bold;
+}
+
+.loading {
+    color: cornflowerblue; 
+}
+
+.error {
+    color: orangered;
 }

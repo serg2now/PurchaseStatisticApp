@@ -10,11 +10,19 @@ import { PurchasesService } from 'src/app/services/purchases.service';
 export class HomeComponent implements OnInit {
   purchases!: Purchase[];
 
+  isLoading = true;
+
   constructor(private service: PurchasesService) { }
 
   ngOnInit(): void {
-    this.service.getPurchases().subscribe((response) => {
-      this.purchases = response;
+    this.service.getPurchases().subscribe({
+      next: (response) => {
+        this.purchases = response;
+        this.isLoading = false;
+      }, 
+      error: () => {
+        this.isLoading = false;
+      }
     });
   }
 
