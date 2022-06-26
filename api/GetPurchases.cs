@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using PurchaseStatisticApp.Api.DTO;
 using PurchaseStatisticApp.Api.Services;
+using PurchaseStatisticApp.Api.DAL;
+using System.Linq;
 
 namespace PurchaseStatisticApp.Api
 {
@@ -22,8 +24,14 @@ namespace PurchaseStatisticApp.Api
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            var service = new PurchasesService();
-            List<PurchaseDto> purchases = service.GetPurchasesAsync();
+            string connectionString = Environment.GetEnvironmentVariable("COSMOS_DB_CONNECTION_STRING");
+            string primaryKey = Environment.GetEnvironmentVariable("COSMOS_DB_PRIMARY_KEY");
+            string dbName = Environment.GetEnvironmentVariable("COSMOS_DB_NAME");
+            string containerName = Environment.GetEnvironmentVariable("COSMOS_DB_CONTAINER_NAME");
+
+            CosmosDbRepository repository = new CosmosDbRepository(connectionString, primaryKey, dbName, containerName);
+            var service = new PurchasesService(repository);
+            IEnumerable<PurchaseDto> purchases = await service.GetPurchasesAsync();
 
             return new OkObjectResult(purchases);
         }
