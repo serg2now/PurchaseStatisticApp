@@ -1,0 +1,16 @@
+<div>
+    <h2>Purchases</h2>
+
+    <p>There is list of all purchases made in a vending machine</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <ng-container *ngIf="purchases && purchases.length > 0 else error">
+                <purchase *ngFor="let purchase of purchases" [purchase]="purchase"></purchase>
+            </ng-container>
+            <ng-template #error>
+                <p class="error">No purchases to display</p>
+            </ng-template>
+        </div>
+    </div>
+</div>
