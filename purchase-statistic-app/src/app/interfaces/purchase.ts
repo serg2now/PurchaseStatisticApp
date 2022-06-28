@@ -4,4 +4,5 @@ export interface Purchase {
     company: string;
     productName: string;
     cost: number;
+    isNew?: boolean;
 }

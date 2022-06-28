@@ -8,7 +8,11 @@
             <p *ngIf="isLoading" class="loading">Loading...</p>
 
             <ng-container *ngIf="purchases && purchases.length > 0 else error">
-                <purchase *ngFor="let purchase of purchases" [purchase]="purchase"></purchase>
+                <div class="pcount">Purchases count: {{purchases.length}}</div>
+
+                <div class="purchases">
+                    <purchase *ngFor="let purchase of purchases" [purchase]="purchase"></purchase>
+                </div>
             </ng-container>
             <ng-template #error>
                 <p *ngIf="!isLoading" class="error">No purchases to display</p>

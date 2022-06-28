@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Purchase } from '../interfaces/purchase';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PurchasesService {
-  private apiUrl = '/api/purchases';
+  private apiUrl = '/api';
 
   constructor(private httpClient: HttpClient) { }
 
   getPurchases(): Observable<Purchase[]> {
-    return this.httpClient.get<Purchase[]>(this.apiUrl);
+    return this.httpClient.get<Purchase[]>(`${this.apiUrl}/purchases`);
+  }
+
+  getNotificationSocketUrl(): Observable<string> {
+    return this.httpClient.get<any>(`${this.apiUrl}/negotiate`).pipe(map((data) => data.url));
   }
 }
