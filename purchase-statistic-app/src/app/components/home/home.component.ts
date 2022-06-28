@@ -26,11 +26,17 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    this.webSocketService.messages$.subscribe((purchase) => {
-      purchase.isNew = true;
-      purchase.productName = `${purchase.productName}22`;
-      this.purchases.push(purchase); 
-      console.log(purchase);
+    this.webSocketService.messages$.subscribe((eventData) => {
+      const purchase = { 
+        productName: eventData.ProductName,
+        company: eventData.Company,
+        cost: eventData.Cost,
+        date: eventData.Date,
+        id: eventData.Id,
+        isNew: true  
+      } as Purchase;
+
+      this.purchases.push(purchase);
     });
   }
 
