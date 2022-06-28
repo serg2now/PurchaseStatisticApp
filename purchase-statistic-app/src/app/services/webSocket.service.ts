@@ -7,8 +7,8 @@ import { Purchase } from '../interfaces/purchase';
   providedIn: 'root'
 })
 export class WebSocketService {
-  private socket$!: WebSocketSubject<any>;
-  private messagesSubject$ = new Subject<Observable<any>>();
+  private socket$!: WebSocketSubject<Purchase>;
+  private messagesSubject$ = new Subject<Observable<Purchase>>();
   public messages$ = this.messagesSubject$.pipe(switchAll(), catchError(e => throwError(() => e)));
 
   constructor() { }
@@ -25,7 +25,7 @@ export class WebSocketService {
     }
   }
   
-  private getNewWebSocket(url: string): WebSocketSubject<any> {
+  private getNewWebSocket(url: string): WebSocketSubject<Purchase> {
     return webSocket(url);
   }
 }
