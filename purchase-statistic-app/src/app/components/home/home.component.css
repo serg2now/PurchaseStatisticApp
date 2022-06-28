@@ -14,3 +14,15 @@ p {
 .error {
     color: orangered;
 }
+
+.purchases {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.pcount {
+    color: cornflowerblue;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}

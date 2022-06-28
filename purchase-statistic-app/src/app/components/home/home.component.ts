@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Purchase } from 'src/app/interfaces/purchase';
 import { PurchasesService } from 'src/app/services/purchases.service';
+import { WebSocketService } from 'src/app/services/webSocket.service';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +13,7 @@ export class HomeComponent implements OnInit {
 
   isLoading = true;
 
-  constructor(private service: PurchasesService) { }
+  constructor(private service: PurchasesService, private webSocketService: WebSocketService) { }
 
   ngOnInit(): void {
     this.service.getPurchases().subscribe({
@@ -25,7 +26,12 @@ export class HomeComponent implements OnInit {
       }
     });
 
-    this.service.getNotificationSocketUrl().subscribe((data) => console.log(data));
+    this.webSocketService.messages$.subscribe((purchase) => {
+      purchase.isNew = true;
+      purchase.productName = `${purchase.productName}22`;
+      this.purchases.push(purchase); 
+      console.log(purchase);
+    });
   }
 
 }
