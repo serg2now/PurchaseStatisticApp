@@ -8,7 +8,7 @@ import { Purchase } from '../interfaces/purchase';
 })
 export class WebSocketService {
   private socket$!: WebSocketSubject<any>;
-  private messagesSubject$ = new Subject<Observable<Purchase>>();
+  private messagesSubject$ = new Subject<Observable<any>>();
   public messages$ = this.messagesSubject$.pipe(switchAll(), catchError(e => throwError(() => e)));
 
   constructor() { }
@@ -19,8 +19,7 @@ export class WebSocketService {
       const notifications = this.socket$.pipe(
         tap({
           error: error => console.log(error),
-        }), catchError(_ => EMPTY),
-        map((event) => { return event as Purchase;}));
+        }), catchError(_ => EMPTY));
 
       this.messagesSubject$.next(notifications);
     }
