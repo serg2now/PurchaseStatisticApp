@@ -24,6 +24,8 @@ export class HomeComponent implements OnInit {
         this.isLoading = false;
       }
     });
+
+    this.service.getNotificationSocketUrl().subscribe((data) => console.log(data));
   }
 
 }
