@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { BrandHealth } from '../../interfaces/brand-health';
 import { ChartData, ChartPart, RadialSector } from '../../interfaces/chart-data';
 import { ShapesDrawerService } from '../../services/shapes-drawer.service';
 import { BaseChartComponent } from '../base-chart/base-chart.component';
@@ -10,7 +9,6 @@ import { BaseChartComponent } from '../base-chart/base-chart.component';
   styleUrls: ['./brand-health-chart.component.css']
 })
 export class BrandHealthChartComponent extends BaseChartComponent implements OnInit {
-  brandHealth!: BrandHealth;
   shapesDrawer!: ShapesDrawerService;
 
   @Input() override width!: number;
@@ -18,7 +16,6 @@ export class BrandHealthChartComponent extends BaseChartComponent implements OnI
 
   private readonly CHART_CENTER_X = 150;
   private readonly CHART_CENTER_Y = 80;
-  private readonly TEXT_SIZE = 8;
   
   constructor() { 
     super('brand-health-chart');
@@ -37,46 +34,71 @@ export class BrandHealthChartComponent extends BaseChartComponent implements OnI
 
   private drawChartDiagram(chartData: ChartData): void {
     const innerRadius = chartData.innerCircle.radius;
-    const outerRadius = 35;
+    const textWeight = chartData.sectorLabelsTextWeight ?? 600;
+    const textSize = chartData.sectorLabelsTextSize ?? 8;
 
-    let pathClass = "inner";
+    chartData.radialSectors.forEach((sector) => {
+      const innerRadiuses = [innerRadius, ...sector.radialLevels.slice(0, sector.radialLevels.length-1).map(l => innerRadius + l.radius)];
 
-    const maxLevelsNumber = chartData.radialSectors.map(s => s.radialLevels.length).reduce((a, b) => a > b ? a : b);
+      const getStartAngel = (d: any) => sector.sectorStartAngel;
+      const getEndAngel = (d: any) => sector.sectorEndAngel;
+      const getInnerRadius = (d: any, i: number) => innerRadiuses[i];
+      const getOuterRadius = (d: any, i: number) => innerRadiuses[i] + d.radius;
+      const getColor = (d: any) => d.color;
+      const className = `${sector.descriptionText}`;
 
-    // for (let i = 0; i < maxLevelsNumber; i++){
-    //   const elClass = `level${i + 1}`;
-    //   const arc = 
-    // }
+      const arc = this.shapesDrawer.buildArc(getStartAngel, getEndAngel, getInnerRadius, getOuterRadius);
+      this.shapesDrawer.drawArcs(sector.radialLevels, arc, this.CHART_CENTER_X, this.CHART_CENTER_Y, className, getColor);
 
-    let getOuterRadius = (d: RadialSector) => innerRadius + d.radialLevels[0].radius;
-    const innerArc = this.shapesDrawer.buildArc((d: any) => d.sectorStartAngel, (d: any) => d.sectorEndAngel, innerRadius, getOuterRadius);
-    this.shapesDrawer.drawArcs(chartData.radialSectors, innerArc, this.CHART_CENTER_X, this.CHART_CENTER_Y, pathClass, (d: any) => d.color);
+      const medianaAngels = this.calcMedianAngels(sector);
+      const textAnchor = 'middle';
 
-    const outerSectors = chartData.radialSectors.filter((sector: any) => sector.radialLevels[1]);
-
-    if (outerSectors.length > 0) {
-      pathClass = "outer";
-      const getInnerRadius = getOuterRadius;
-      getOuterRadius = (d: RadialSector) => innerRadius + d.radialLevels[0].radius + d.radialLevels[1].radius;
-      const outerArc = this.shapesDrawer.buildArc((d: any) => d.sectorStartAngel, (d: any) => d.sectorEndAngel, getInnerRadius, getOuterRadius)
-
-      this.shapesDrawer.drawArcs(outerSectors, outerArc, this.CHART_CENTER_X, this.CHART_CENTER_Y, pathClass,(d: any) => d.radialLevels[1].color);
-    }
+      this.shapesDrawer.drawText(
+        sector.radialLevels,
+        (d: any,  i: number) => this.CHART_CENTER_X + medianaAngels.angelX * (innerRadiuses[i] + (d.radius)*0.75),
+        (d: any, i: number) => this.CHART_CENTER_Y + medianaAngels.angelY * (innerRadiuses[i] + (d.radius)*0.5),
+        textSize,
+        (d: any) => `${d.value ?? ''}`,
+        `${sector.descriptionText}`,
+        textWeight,
+        sector.labelColor,
+        textAnchor); 
+    });
     
     const circleClass = "inner";
     this.shapesDrawer.drawCircles([chartData.innerCircle], this.CHART_CENTER_X, this.CHART_CENTER_Y, innerRadius, (d: any) => d.color, circleClass);
-    
-    // this.svg.append("text").selectAll("tspan.radial")
-    //   .data(chartData.radialSectors)
-    //   .enter().append("tspan")
-    //               .attr("class","radial")
-    //               .attr("x", (d: any) => this.CHART_CENTER_X + ((d.sectorEndAngel > 0) ? 50 : -50))
-    //               .attr("y", (d: any) => this.CHART_CENTER_Y +((d.sectorStartAngel > 1.5) ? 20 : -20))
-    //               .attr("font-size", this.TEXT_SIZE)
-    //               .attr('fill', (d: any) => d.labelColor)
-    //               .attr("dominant-baseline","bottom")
-    //               .text((d: any) => `${d.value}`);
+
+    const startX = this.CHART_CENTER_X-innerRadius/2;
+    const startY = this.CHART_CENTER_Y + textSize/2;
+    const labelClass = "label";
+    const getValue = (d: any) => d.value;
+    const getLabelColor = (d: any) => d.labelColor;
+    this.shapesDrawer.drawText([chartData.innerCircle], startX, startY, textSize, getValue, labelClass, textWeight, getLabelColor);
   }
+
+  private calcMedianAngels(sector: RadialSector): {angelX: number, angelY: number} {
+    const medianaAngel = (sector.sectorStartAngel + sector.sectorEndAngel)/2;
+
+    let medianaAngelX = (medianaAngel <= Math.PI / 2) 
+      ? medianaAngel 
+      : (medianaAngel > Math.PI * 1.5)
+        ? - (Math.PI * 2 - medianaAngel)
+        : (medianaAngel <= Math.PI) 
+          ? (Math.PI - medianaAngel)
+          : - (medianaAngel - Math.PI);
+    medianaAngelX = medianaAngelX/(Math.PI/2);
+
+    let medianAngelY = (medianaAngel < Math.PI / 2)
+      ? -(Math.PI / 2 - medianaAngel)
+      : (medianaAngel > Math.PI * 1.5)
+        ? -(medianaAngel - Math.PI * 1.5)
+        : (medianaAngel <= Math.PI) 
+          ? medianaAngel - Math.PI / 2 
+          : Math.PI / 2 - (medianaAngel - Math.PI);
+    medianAngelY = medianAngelY/(Math.PI/2);
+
+    return { angelX: medianaAngelX, angelY: medianAngelY };
+  } 
 
   private drawDescription(chartData: ChartData): void {
     const descriptions: ChartPart[] = [...chartData.radialSectors, chartData.innerCircle];
@@ -93,9 +115,10 @@ export class BrandHealthChartComponent extends BaseChartComponent implements OnI
 
     xStart = xStart + radius + 5;
     yStart = yStart + radius/2;
-    const fontWeight = 400;
+    const textWeight = chartData.descriptionTextWeight ?? 400;
+    const textSize = chartData.descriptionTextSize ?? 8;
     const getText = (d: any) => d.descriptionText;
-    this.shapesDrawer.drawText(descriptions, xStart, cYFunc, this.TEXT_SIZE, fontWeight, getText, circleClass);
+    this.shapesDrawer.drawText(descriptions, xStart, cYFunc, textSize, getText, circleClass, textWeight);
   }
 
 }

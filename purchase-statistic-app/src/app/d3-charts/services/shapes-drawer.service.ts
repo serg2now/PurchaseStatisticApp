@@ -6,17 +6,17 @@ export class ShapesDrawerService {
 
   constructor(private svg: any) { }
 
- buildArc(startAngleFunc: GetNumberFunction, endAngleFunc: GetNumberFunction, innerRadius: any, outerRadius: any): d3.Arc<any, d3.DefaultArcObject>
+ buildArc(startAngle: GetNumberFunction, endAngle: GetNumberFunction, innerRadius: GetNumberFunction, outerRadius: GetNumberFunction): d3.Arc<any, d3.DefaultArcObject>
   {
     return d3.arc()
-      .startAngle(startAngleFunc)
-      .endAngle(endAngleFunc)
+      .startAngle(startAngle)
+      .endAngle(endAngle)
       .innerRadius(innerRadius)
       .outerRadius(outerRadius);
   }
 
   drawArcs(
-    data: RadialSector[],
+    data: RadialLevel[],
     arcObject: d3.Arc<any, d3.DefaultArcObject>,
     centerX: number,
     centerY: number,
@@ -54,13 +54,17 @@ export class ShapesDrawerService {
                   .attr("y", startY);
   }
 
-  drawText(data: any, startX: any, startY: any, fontSize: any, fontWeight: any, text: GetStringFunction, elClass: any): void {
+  drawText(data: any, startX: any, startY: any, fontSize: any, text: GetStringFunction, elClass: any, fontWeight: any, fill?: any, anchor?: any): void {
+    fill = fill ?? 'black';
+    anchor = anchor ?? 'start'; 
     this.svg.append("text").selectAll(`tspan.${elClass}`)
       .data(data)
       .enter().append("tspan")
                   .attr("class",`${elClass}`)
                   .attr("x", startX)
                   .attr("y", startY)
+                  .attr("fill", fill)
+                  .attr("text-anchor", anchor)
                   .attr("font-size", fontSize)
                   .attr("font-weight", fontWeight)
                   .text(text);

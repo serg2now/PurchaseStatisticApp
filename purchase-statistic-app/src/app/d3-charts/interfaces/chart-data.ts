@@ -22,6 +22,10 @@ export interface InnerCircle extends ChartPart {
 }
 
 export interface ChartData {
+    sectorLabelsTextSize?: number;
+    sectorLabelsTextWeight?: number;
+    descriptionTextSize?: number;
+    descriptionTextWeight?: number; 
     radialSectors: RadialSector[];
     innerCircle: InnerCircle;
 }

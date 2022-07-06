@@ -14,7 +14,6 @@ export abstract class BaseChartComponent {
     this.svg = d3.select(`figure#${this.selector}`)
     .append("svg")
     .attr("width", this.width)
-    .attr("height", this.height)
-    .append("g");
+    .attr("height", this.height);
   }
 }
