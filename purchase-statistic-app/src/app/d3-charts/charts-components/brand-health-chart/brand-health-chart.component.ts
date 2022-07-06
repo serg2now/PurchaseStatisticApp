@@ -15,7 +15,7 @@ export class BrandHealthChartComponent extends BaseChartComponent implements OnI
   @Input() override height!: number;
 
   private readonly CHART_CENTER_X = 150;
-  private readonly CHART_CENTER_Y = 80;
+  private readonly CHART_CENTER_Y = 150;
   
   constructor() { 
     super('brand-health-chart');
@@ -68,12 +68,12 @@ export class BrandHealthChartComponent extends BaseChartComponent implements OnI
     const circleClass = "inner";
     this.shapesDrawer.drawCircles([chartData.innerCircle], this.CHART_CENTER_X, this.CHART_CENTER_Y, innerRadius, (d: any) => d.color, circleClass);
 
-    const startX = this.CHART_CENTER_X-innerRadius/2;
+    const startX = this.CHART_CENTER_X;
     const startY = this.CHART_CENTER_Y + textSize/2;
     const labelClass = "label";
     const getValue = (d: any) => d.value;
     const getLabelColor = (d: any) => d.labelColor;
-    this.shapesDrawer.drawText([chartData.innerCircle], startX, startY, textSize, getValue, labelClass, textWeight, getLabelColor);
+    this.shapesDrawer.drawText([chartData.innerCircle], startX, startY, textSize, getValue, labelClass, textWeight, getLabelColor, 'middle');
   }
 
   private calcMedianAngels(sector: RadialSector): {angelX: number, angelY: number} {
