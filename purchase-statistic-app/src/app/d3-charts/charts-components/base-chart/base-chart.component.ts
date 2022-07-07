@@ -16,4 +16,8 @@ export abstract class BaseChartComponent {
     .attr("width", this.width)
     .attr("height", this.height);
   }
+
+  protected clearCanvas(): void {
+    this.svg.selectAll('*').remove();
+  }
 }
