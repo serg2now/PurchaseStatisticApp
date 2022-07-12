@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Purchase } from '../interfaces/purchase';
 import { map, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PurchasesService {
-  private apiUrl = '/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private httpClient: HttpClient) { }
 
